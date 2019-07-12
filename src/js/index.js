@@ -1505,13 +1505,1117 @@ console.log(Customer.getMembershipCost());
 
 
 /* **************************************************************
-ES6 SubClasses
+XHR Objects  & Working with Methods
+************************************************************** */
+
+
+document.getElementById('button').addEventListener('click', loadData);
+
+function loadData() {
+    // Create an XHR Object
+    const xhr = new XMLHttpRequest();
+    
+    // OPEN
+    xhr.open('GET', 'data.txt', true);
+    
+    // console.log('READYSTATE', xhr.readyState);
+    
+    // Optional - Used for spinners/loaders
+    xhr.onprogress = function(){
+        console.log('READYSTATE', xhr.readyState);
+    }
+    
+    xhr.onload = function(){
+        console.log('READYSTATE', xhr.readyState);
+        if(this.status === 200) {
+            // console.log(this.responseText);
+            document.getElementById('output').innerHTML = `<h1>${this.responseText}</h1>`;
+        }
+    }
+    
+    // xhr.onreadystatechange = function() {
+        //   console.log('READYSTATE', xhr.readyState);
+        //   if(this.status === 200 && this.readyState === 4){
+            //     console.log(this.responseText);
+            //   }
+            // }
+            
+            xhr.onerror = function() {
+                console.log('Request error...');
+            }
+            
+            xhr.send();
+            
+            
+            // readyState Values
+            // 0: request not initialized 
+            // 1: server connection established
+            // 2: request received 
+            // 3: processing request 
+            // 4: request finished and response is ready
+            
+            
+            // HTTP Statuses
+            // 200: "OK"
+            // 403: "Forbidden"
+            // 404: "Not Found"
+        }
+
+        /* **************************************************************
+        Working with AJAX - JSON Object
+        ************************************************************** */
+       
+       document.getElementById('button1').addEventListener('click', loadCustomer);
+       
+       document.getElementById('button2').addEventListener('click', loadCustomers);
+       
+       // Load Single Customer
+       function loadCustomer(e) {
+           const xhr = new XMLHttpRequest();
+           
+           xhr.open('GET', 'customer.json', true);
+           
+           xhr.onload = function(){
+               if(this.status === 200) {
+                   // console.log(this.responseText);
+                   
+                   const customer = JSON.parse(this.responseText);
+                   
+                   const output = `
+                   <ul>
+                   <li>ID: ${customer.id}</li>
+                   <li>Name: ${customer.name}</li>
+                   <li>Company: ${customer.company}</li>
+                   <li>Phone: ${customer.phone}</li>
+                   </ul>
+                   `;
+                   
+                   document.getElementById('customer').innerHTML = output;
+                }
+            }
+            
+  xhr.send();
+}
+
+
+// Load Customers
+function loadCustomers(e) {
+    const xhr = new XMLHttpRequest();
+    
+    xhr.open('GET', 'customers.json', true);
+    
+    xhr.onload = function(){
+    if(this.status === 200) {
+        // console.log(this.responseText);
+        
+        const customers = JSON.parse(this.responseText);
+        
+        let output = '';
+        
+        customers.forEach(function(customer){
+            output += `
+            <ul>
+            <li>ID: ${customer.id}</li>
+            <li>Name: ${customer.name}</li>
+            <li>Company: ${customer.company}</li>
+            <li>Phone: ${customer.phone}</li>
+            </ul>
+            `;
+        });
+        
+        document.getElementById('customers').innerHTML = output;
+    }
+}
+
+xhr.send();
+}
+
+/* **************************************************************
+Data from External API - Chuck Norris Project
+************************************************************** */
+
+
+
+document.querySelector('.get-jokes').addEventListener('click', getJokes);
+
+function getJokes(e) {
+    const number = document.querySelector('input[type="number"]').value;
+    
+    const xhr = new XMLHttpRequest();
+    
+    xhr.open('GET', `http://api.icndb.com/jokes/random/${number}`, true);
+    
+    xhr.onload = function() {
+        if(this.status === 200) {
+            const response = JSON.parse(this.responseText);
+            
+            let output = '';
+            
+            if(response.type === 'success') {
+                response.value.forEach(function(joke){
+                    output += `<li>${joke.joke}</li>`;
+                });
+            } else {
+                output += '<li>Something went wrong</li>';
+            }
+            
+            document.querySelector('.jokes').innerHTML = output;
+        }
+    }
+    
+    xhr.send();
+    
+    e.preventDefault();
+}
+
+/* **************************************************************
+Callbacks functions
+************************************************************** */
+
+const posts = [
+    {title: 'Post One', body: 'This is post one'},
+    {title: 'Post Two', body: 'This is post two'}
+];
+
+// function createPost(post) {
+    //   setTimeout(function() {
+        //     posts.push(post);
+        //   }, 2000);
+        // }
+        
+        
+        // function getPosts() {
+            //   setTimeout(function() {
+                //     let output = '';
+                //     posts.forEach(function(post){
+                    //       output += `<li>${post.title}</li>`;
+                    //     });
+                    //     document.body.innerHTML = output;
+                    //   }, 1000);
+                    // }
+                    
+                    // createPost({title: 'Post Three', body: 'This is post three'});
+                    
+                    // getPosts();
+                    
+                    
+                    function createPost(post, callback) {
+                        setTimeout(function() {
+                            posts.push(post);
+                            callback();
+                        }, 2000);
+                    }
+                    
+                    
+                    function getPosts() {
+                        setTimeout(function() {
+                            let output = '';
+                            posts.forEach(function(post){
+                                output += `<li>${post.title}</li>`;
+                            });
+    document.body.innerHTML = output;
+}, 1000);
+}
+
+createPost({title: 'Post Three', body: 'This is post three'}, getPosts);
+
+/* **************************************************************
+Custom HTTP Library - AJAX calls - Part 1
 ************************************************************** */
 
 
 
 
 
+function easyHTTP() {
+  this.http = new XMLHttpRequest();
+}
+
+// Make an HTTP GET Request
+easyHTTP.prototype.get = function(url, callback) {
+  this.http.open('GET', url, true);
+
+  let self = this;
+  this.http.onload = function() {
+    if(self.http.status === 200) {
+      callback(null, self.http.responseText);
+    } else {
+      callback('Error: ' + self.http.status);
+    }
+  }
+
+  this.http.send();
+
+}
+
+/* --------------------------
+-------------------------- */
+
+// Make an HTTP POST Request
+
+// Make an HTTP PUT Request
+
+// Make an HTTP DELETE Request
+
+const http = new easyHTTP;
+
+// Get Posts
+http.get('https://jsonplaceholder.typicode.com/posts', function(err, posts) {
+  if(err) {
+    console.log(err);
+  } else {
+    console.log(posts);
+  }
+});
+
+
+/* **************************************************************
+Custom HTTP Library - AJAX calls - Part 2
+************************************************************** */
+
+
+function easyHTTP() {
+  this.http = new XMLHttpRequest();
+}
+
+// Make an HTTP GET Request
+easyHTTP.prototype.get = function(url, callback) {
+  this.http.open('GET', url, true);
+
+  let self = this;
+  this.http.onload = function() {
+    if(self.http.status === 200) {
+      callback(null, self.http.responseText);
+    } else {
+      callback('Error: ' + self.http.status);
+    }
+  }
+
+  this.http.send();
+}
+
+// Make an HTTP POST Request
+easyHTTP.prototype.post = function(url, data, callback) {
+  this.http.open('POST', url, true);
+  this.http.setRequestHeader('Content-type', 'application/json');
+
+  let self = this;
+  this.http.onload = function() {
+    callback(null, self.http.responseText);
+  }
+
+  this.http.send(JSON.stringify(data));
+}
+
+
+// Make an HTTP PUT Request
+easyHTTP.prototype.put = function(url, data, callback) {
+  this.http.open('PUT', url, true);
+  this.http.setRequestHeader('Content-type', 'application/json');
+
+  let self = this;
+  this.http.onload = function() {
+    callback(null, self.http.responseText);
+  }
+
+  this.http.send(JSON.stringify(data));
+}
+
+// Make an HTTP DELETE Request
+easyHTTP.prototype.delete = function(url, callback) {
+  this.http.open('DELETE', url, true);
+
+  let self = this;
+  this.http.onload = function() {
+    if(self.http.status === 200) {
+      callback(null, 'Post Deleted');
+    } else {
+      callback('Error: ' + self.http.status);
+    }
+  }
+
+  this.http.send();
+}
+
+/* --------------------------
+-------------------------- */
+
+
+const http = new easyHTTP;
+
+// Get Posts
+// http.get('https://jsonplaceholder.typicode.com/posts', function(err, posts) {
+//   if(err) {
+//     console.log(err);
+//   } else {
+//     console.log(posts);
+//   }
+// });
+
+// Get Single Post
+// http.get('https://jsonplaceholder.typicode.com/posts/1', function(err, post) {
+//   if(err) {
+//     console.log(err);
+//   } else {
+//     console.log(post);
+//   }
+// });
+
+// Create Data
+const data = {
+  title: 'Custom Post',
+  body: 'This is a custom post'
+};
+
+// Create Post
+// http.post('https://jsonplaceholder.typicode.com/posts', data, function(err, post) {
+//   if(err) {
+//     console.log(err);
+//   } else {
+//     console.log(post);
+//   }
+// });
+
+// Update Post
+// http.put('https://jsonplaceholder.typicode.com/posts/5', data, function(err, post) {
+//   if(err) {
+//     console.log(err);
+//   } else {
+//     console.log(post);
+//   }
+// });
+
+// Delete Post
+http.delete('https://jsonplaceholder.typicode.com/posts/1', function(err, response) {
+  if(err) {
+    console.log(err);
+  } else {
+    console.log(response);
+  }
+});
+
+
+/* **************************************************************
+E6 Promises
+************************************************************** */
+
+const posts = [
+    {title: 'Post One', body:'This is post one'},
+    {title: 'Post Two', body: 'This is post two'}
+];
+
+function createPost(post) {
+    return new Promise(function(resolve, reject){
+        setTimeout(function() {
+            posts.push(post);
+            
+            const error = false;
+            
+            if(!error) {
+                resolve();
+            } else {
+                reject('Error: Something went wrong');
+            }
+        }, 2000);
+    });
+}
+
+function getPosts() {
+    setTimeout(function() {
+        let output = '';
+        posts.forEach(function(post){
+            output += `<li>${post.title}</li>`;
+        });
+        document.body.innerHTML = output;
+    }, 1000);
+}
+
+createPost({title: 'Post Three', body: 'This is post three'})
+.then(getPosts)
+.catch(function(err) {
+    console.log(err);
+});
+
+/* **************************************************************
+Fetch API
+************************************************************** */
+
+
+document.getElementById('button1').addEventListener('click', getText);
+
+document.getElementById('button2').addEventListener('click', getJson);
+
+document.getElementById('button3').addEventListener('click', getExternal);
+
+// Get local text file data
+function getText() {
+    fetch('test.txt')
+    .then(function(res){
+        return res.text();
+    })
+    .then(function(data) {
+        console.log(data);
+        document.getElementById('output').innerHTML = data;
+    })
+    .catch(function(err){
+        console.log(err);
+    });
+}
+
+
+// Get local json data
+function getJson() {
+    fetch('posts.json')
+    .then(function(res){
+        return res.json();
+    })
+    .then(function(data) {
+        console.log(data);
+        let output = '';
+        data.forEach(function(post) {
+            output += `<li>${post.title}</li>`;
+        });
+        document.getElementById('output').innerHTML = output;
+    })
+    .catch(function(err){
+        console.log(err);
+    });
+}
+
+
+// Get from external API
+function getExternal() {
+    fetch('https://api.github.com/users')
+    .then(function(res){
+        return res.json();
+    })
+    .then(function(data) {
+        console.log(data);
+        let output = '';
+        data.forEach(function(user) {
+            output += `<li>${user.login}</li>`;
+        });
+        document.getElementById('output').innerHTML = output;
+    })
+    .catch(function(err){
+        console.log(err);
+    });
+}
+
+/* **************************************************************
+Arrow Functions
+************************************************************** */
+
+
+document.getElementById('button1').addEventListener('click', getText);
+
+document.getElementById('button2').addEventListener('click', getJson);
+
+document.getElementById('button3').addEventListener('click', getExternal);
+
+// Get local text file data
+function getText() {
+    fetch('test.txt')
+    .then(res => res.text())
+    .then(data => {
+      console.log(data);
+      document.getElementById('output').innerHTML = data;
+    })
+    .catch(err => console.log(err));
+}
+
+
+// Get local json data
+function getJson() {
+    fetch('posts.json')
+    .then(res => res.json())
+    .then(data => {
+        console.log(data);
+        let output = '';
+        data.forEach(function(post) {
+            output += `<li>${post.title}</li>`;
+        });
+        document.getElementById('output').innerHTML = output;
+    })
+    .catch(err => console.log(err));
+}
+
+
+// Get from external API
+function getExternal() {
+    fetch('https://api.github.com/users')
+    .then(res => res.json())
+    .then(data => {
+        console.log(data);
+        let output = '';
+        data.forEach(function(user) {
+            output += `<li>${user.login}</li>`;
+        });
+        document.getElementById('output').innerHTML = output;
+    })
+    .catch(err => console.log(err));
+}
+
+/* **************************************************************
+Custom HTTP Library  -  Fetch with Promises
+************************************************************** *//**
+ * EasyHTTP Library
+ * Library for making HTTP requests
+ *
+ * @version 2.0.0
+ * @author  Brad Traversy
+ * @license MIT
+ *
+ **/
+
+ class EasyHTTP {
+   
+  // Make an HTTP GET Request 
+  get(url) {
+    return new Promise((resolve, reject) => {
+      fetch(url)
+      .then(res => res.json())
+      .then(data => resolve(data))
+      .catch(err => reject(err));
+    });
+  }
+
+  // Make an HTTP POST Request
+  post(url, data) {
+    return new Promise((resolve, reject) => {
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(data => resolve(data))
+      .catch(err => reject(err));
+    });
+  }
+
+   // Make an HTTP PUT Request
+   put(url, data) {
+    return new Promise((resolve, reject) => {
+      fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(data => resolve(data))
+      .catch(err => reject(err));
+    });
+  }
+
+  // Make an HTTP DELETE Request
+  delete(url) {
+    return new Promise((resolve, reject) => {
+      fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-type': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .then(() => resolve('Resource Deleted...'))
+      .catch(err => reject(err));
+    });
+  }
+
+ }
+
+ 
+/* -------------------------------------
+------------------------------------- */
+
+
+const http = new EasyHTTP;
+
+// Get Users
+// http.get('https://jsonplaceholder.typicode.com/users')
+//   .then(data => console.log(data))
+//   .catch(err => console.log(err));
+
+// User Data
+const data = {
+  name: 'John Doe',
+  username: 'johndoe',
+  email: 'jdoe@gmail.com'
+}
+
+// Create User
+// http.post('https://jsonplaceholder.typicode.com/users', data)
+//   .then(data => console.log(data))
+//   .catch(err => console.log(err));
+
+// Update Post
+// http.put('https://jsonplaceholder.typicode.com/users/2', data)
+//   .then(data => console.log(data))
+//   .catch(err => console.log(err));
+
+// Delete User
+http.delete('https://jsonplaceholder.typicode.com/users/2')
+.then(data => console.log(data))
+.catch(err => console.log(err));
+
+
+/* **************************************************************
+Async  - Await
+************************************************************** */
+
+
+
+
+
+// async function myFunc() {
+//   const promise = new Promise((resolve, reject) => {
+//     setTimeout(() => resolve('Hello'), 1000);
+//   });
+
+//   const error = false;
+
+//   if(!error){
+//     const res = await promise; // Wait until promise is resolved
+//     return res;
+//   } else {
+//     await Promise.reject(new Error('Something went wrong'));
+//   }
+// }
+
+// myFunc()
+//   .then(res => console.log(res))
+//   .catch(err => console.log(err));
+
+async function getUsers() {
+  // await response of the fetch call
+  const response = await fetch('https://jsonplaceholder.typicode.com/users');
+
+  // Only proceed once its resolved
+  const data = await response.json();
+
+  // only proceed once second promise is resolved
+  return data;
+}
+
+getUsers().then(users => console.log(users));
+
+
+
+/* **************************************************************
+Custom HTTP - Library with  Async Await
+************************************************************** */
+
+
+/**
+ * EasyHTTP Library
+ * Library for making HTTP requests
+ *
+ * @version 3.0.0
+ * @author  Brad Traversy
+ * @license MIT
+ *
+ **/
+
+ class EasyHTTP {
+  // Make an HTTP GET Request 
+  async get(url) {
+    const response = await fetch(url);
+    const resData = await response.json();
+    return resData;
+  }
+
+  // Make an HTTP POST Request
+  async post(url, data) {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    const resData = await response.json();
+    return resData;
+   
+  }
+
+   // Make an HTTP PUT Request
+   async put(url, data) {
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    
+    const resData = await response.json();
+    return resData;
+  }
+
+  // Make an HTTP DELETE Request
+  async delete(url) {
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-type': 'application/json'
+      }
+    });
+
+    const resData = await 'Resource Deleted...';
+    return resData;
+  }
+
+ }
+
+ 
+/* -------------------------------------
+------------------------------------- */
+
+
+
+const http = new EasyHTTP;
+
+// Get Users
+// http.get('https://jsonplaceholder.typicode.com/users')
+//   .then(data => console.log(data))
+//   .catch(err => console.log(err));
+
+// User Data
+const data = {
+  name: 'John Doe',
+  username: 'johndoe',
+  email: 'jdoe@gmail.com'
+}
+
+// Create User
+// http.post('https://jsonplaceholder.typicode.com/users', data)
+//   .then(data => console.log(data))
+//   .catch(err => console.log(err));
+
+// Update Post
+// http.put('https://jsonplaceholder.typicode.com/users/2', data)
+//   .then(data => console.log(data))
+//   .catch(err => console.log(err));
+
+// Delete User
+http.delete('https://jsonplaceholder.typicode.com/users/2')
+.then(data => console.log(data))
+.catch(err => console.log(err));
+
+
+
+/* **************************************************************
+Error Handling -  Try Catch
+************************************************************** */
+
+
+
+const user = {email: 'jdoe@gmail.com'};
+
+try {
+    // Produce a ReferenceError
+    // myFunction();
+    
+    // Produce a TypeError
+    // null.myFunction();
+
+    // Will produce SyntaxError
+    // eval('Hello World');
+    
+    // Will produce a URIError
+    // decodeURIComponent('%');
+    
+    if(!user.name) {
+        //throw 'User has no name';
+        throw new SyntaxError('User has no name');
+    }
+    
+} catch(e) {
+    console.log(`User Error: ${e.message}`);
+    // console.log(e);
+    // console.log(e.message);
+  // console.log(e.name);
+  // console.log(e instanceof TypeError);
+} finally {
+    console.log('Finally runs reguardless of result...');
+}
+
+console.log('Program continues...');
+
+
+
+/* **************************************************************
+Regular Expressions - Part 1
+************************************************************** */
+
+
+let re = /hello/;
+re = /hello/i; // i =  case insensitive
+// re = /hello/g; // Global search
+
+// console.log(re);
+// console.log(re.source);
+
+// exec() - Return result in an array or null
+// const result = re.exec('hello world');
+
+// console.log(result);
+// console.log(result[0]);
+// console.log(result.index);
+// console.log(result.input);
+
+// test() - Returns true or false
+// const result = re.test('Hello');
+// console.log(result);
+
+// match() - Return result array or null
+// const str = 'Hello There';
+// const result = str.match(re);
+// console.log(result);
+
+// search() - Returns index of the first match if not found retuns -1
+// const str = 'Brad Hello There';
+// const result = str.search(re);
+// console.log(result);
+
+// replace() - Return new string with some or all matches of a pattern
+// const str = 'Hello There';
+// const newStr = str.replace(re, 'Hi');
+// console.log(newStr);
+
+
+
+
+/* **************************************************************
+Regular Expressions - Part 2
+************************************************************** */
+
+
+let re;
+// Literal Characters
+re = /hello/;
+re = /hello/i;
+
+// Metacharacter Symbols
+re = /^h/i;           // Must start with
+re = / world$/i;     // Must ends with
+re = /^hello$/i;     // Must begin and end with
+re = /h.llo/i;      // Matches any ONE character
+re = /h*llo/i;      // Matches any character 0 or more times
+re = /gre?a?y/i;    // Optional character
+re = /gre?a?y\?/i;    // Escape character 
+
+
+// String to match
+const str = 'Gray?';
+
+
+// Log Results
+const result = re.exec(str);
+console.log(result);
+
+function reTest(re, str) {
+    if (re.test(str)) {
+        console.log(`${str} matches ${re.source}`);
+    } else {
+        console.log(`${str} does NOT match ${re.source}`);
+    }
+}
+
+reTest(re, str);
+
+
+
+/* **************************************************************
+Regular Expressions - Part 3
+************************************************************** */
+
+
+
+let re;
+// Literal Characters
+re = /hello/;
+re = /hello/i;
+
+// Metacharacter Symbols
+re = /^h/i;           // Must start with
+re = / world$/i;     // Must ends with
+re = /^hello$/i;     // Must begin and end with
+re = /h.llo/i;      // Matches any ONE character
+re = /h*llo/i;      // Matches any character 0 or more times
+re = /gre?a?y/i;    // Optional character
+re = /gre?a?y\?/i;    // Escape character 
+
+
+// Brackets [] - Character Sets
+re = /gr[ae]y/i;      // Must be an a or e
+re = /[GF]ray/i;      // Must be a G or F
+re = /[^GF]ray/i;      // Match anything except a G or F
+re = /[A-Z]ray/;      // Match any uppercase letter
+re = /[a-z]ray/;      // Match any lowercase letter
+re = /[A-Za-z]ray/;   // Match any  letter
+re = /[0-9][0-9]ray/;      // Match any digit
+
+// Braces {} - Quantifiers
+re = /Hel{2}o/i;      // Must occur exactly {m} amount of times
+re = /Hel{2,4}o/i;      // Must occur exactly {m} amount of times
+re = /Hel{2,}o/i;      // Must occur at least {m} times
+
+// Paretheses () - Grouping
+re = /^([0-9]x){3}$/
+
+// String to match
+const str = '3x3x3x';
+
+// Log Results
+const result = re.exec(str);
+console.log(result);
+
+function reTest(re, str) {
+    if (re.test(str)) {
+        console.log(`${str} matches ${re.source}`);
+    } else {
+        console.log(`${str} does NOT match ${re.source}`);
+    }
+}
+
+reTest(re, str);
+
+
+
+
+/* **************************************************************
+Regular Expressions - Part 4
+************************************************************** */
+
+
+let re;
+// Literal Characters
+re = /hello/;
+re = /hello/i;
+
+// Metacharacter Symbols
+re = /^h/i;           // Must start with
+re = / world$/i;     // Must ends with
+re = /^hello$/i;     // Must begin and end with
+re = /h.llo/i;      // Matches any ONE character
+re = /h*llo/i;      // Matches any character 0 or more times
+re = /gre?a?y/i;    // Optional character
+re = /gre?a?y\?/i;    // Escape character 
+
+
+// Brackets [] - Character Sets
+re = /gr[ae]y/i;      // Must be an a or e
+re = /[GF]ray/i;      // Must be a G or F
+re = /[^GF]ray/i;      // Match anything except a G or F
+re = /[A-Z]ray/;      // Match any uppercase letter
+re = /[a-z]ray/;      // Match any lowercase letter
+re = /[A-Za-z]ray/;   // Match any  letter
+re = /[0-9][0-9]ray/;      // Match any digit
+
+// Braces {} - Quantifiers
+re = /Hel{2}o/i;      // Must occur exactly {m} amount of times
+re = /Hel{2,4}o/i;      // Must occur exactly {m} amount of times
+re = /Hel{2,}o/i;      // Must occur at least {m} times
+
+// Paretheses () - Grouping
+re = /^([0-9]x){3}$/
+
+// Shorthand Character Classes
+re = /\w/;    // Word character - alphanumeric or _
+re = /\w+/;    // + = one or more
+re = /\W/;    // Non-Word character
+re = /\d/;    // Match any digit
+re = /\d+/;    // Match any digit 0 or more times
+re = /\D/;      // Match any Non-digit
+re = /\s/;      // Match whitespace char
+re = /\S/;      // Match non-whitespace char
+re = /Hell\b/i; // Word boundary
+
+// Assertions
+re = /x(?=y)/;  // Match x only if followed by y
+re = /x(?!y)/;  // Match x only if NOT followed by y
+
+// String to match
+const str = 'dkjekdxydjekdj';
+
+// Log Results
+const result = re.exec(str);
+console.log(result);
+
+function reTest(re, str) {
+    if(re.test(str)) {
+        console.log(`${str} matches ${re.source}`);
+    } else {
+        console.log(`${str} does NOT match ${re.source}`);
+    }
+}
+
+reTest(re, str);
+
+
+
+/* **************************************************************
+Regular Expressions - Part 5 - Form Validation
+************************************************************** */
+
+
+
+// Form Blur Event Listeners
+document.getElementById('name').addEventListener('blur', validateName);
+document.getElementById('zip').addEventListener('blur', validateZip);
+document.getElementById('email').addEventListener('blur', validateEmail);
+document.getElementById('phone').addEventListener('blur', validatePhone);
+
+function validateName() {
+  const name = document.getElementById('name');
+  const re = /^[a-zA-Z]{2,10}$/;
+
+  if(!re.test(name.value)){
+    name.classList.add('is-invalid');
+  } else {
+    name.classList.remove('is-invalid');
+  }
+}
+
+function validateZip() {
+  const zip = document.getElementById('zip');
+  const re = /^[0-9]{5}(-[0-9]{4})?$/;
+
+  if(!re.test(zip.value)){
+    zip.classList.add('is-invalid');
+  } else {
+    zip.classList.remove('is-invalid');
+  }
+}
+
+function validateEmail() {
+  const email = document.getElementById('email');
+  const re = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
+
+  if(!re.test(email.value)){
+    email.classList.add('is-invalid');
+  } else {
+    email.classList.remove('is-invalid');
+  }
+}
+
+function validatePhone() {
+  const phone = document.getElementById('phone');
+  const re = /^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$/;
+
+  if(!re.test(phone.value)){
+    phone.classList.add('is-invalid');
+  } else {
+    phone.classList.remove('is-invalid');
+  }
+}
 
 
 
