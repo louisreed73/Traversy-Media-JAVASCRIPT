@@ -2618,4 +2618,715 @@ function validatePhone() {
 }
 
 
+/* **************************************************************
+Iterators & Generators
+************************************************************** */
 
+
+// Iterator Example
+// function nameIterator(names) {
+    //   let nextIndex = 0;
+    
+    //   return {
+        //     next: function() {
+            //       return nextIndex < names.length ?
+            //       { value: names[nextIndex++], done: false } :
+            //       { done: true }
+            //     }
+            //   }
+            // }
+            
+            // // Create an array of names
+            // const namesArr = ['Jack', 'Jill', 'John'];
+            // // Init iterator and pass in the names array
+            // const names = nameIterator(namesArr);
+            
+            // console.log(names.next().value);
+            // console.log(names.next().value);
+            // console.log(names.next().value);
+            // console.log(names.next().value);
+            
+            // Generator Example
+            // function* sayNames() {
+                //   yield 'Jack';
+                //   yield 'Jill';
+                //   yield 'John';
+                // }
+                
+                // const name = sayNames();
+
+                // console.log(name.next().value);
+// console.log(name.next().value);
+// console.log(name.next().value);
+// console.log(name.next().value);
+
+// ID Creator
+function* createIds() {
+    let index = 1;
+    
+    while(true) {
+        yield index++;
+    }
+}
+
+const gen = createIds();
+
+console.log(gen.next().value);
+console.log(gen.next().value);
+console.log(gen.next().value);
+console.log(gen.next().value);
+console.log(gen.next().value);
+console.log(gen.next().value);
+
+
+
+/* **************************************************************
+Profile Scroller - Iterator Mini Project
+************************************************************** */
+
+
+const data = [
+    {
+        name: 'John Doe',
+        age: 32,
+        gender: 'male',
+        lookingfor: 'female',
+        location: 'Boston MA',
+        image: 'https://randomuser.me/api/portraits/men/82.jpg'
+    },
+    {
+        name: 'Jen Smith',
+        age: 26,
+        gender: 'female',
+        lookingfor: 'male',
+        location: 'Miami FL',
+        image: 'https://randomuser.me/api/portraits/women/82.jpg'
+    },
+    {
+        name: 'William Johnson',
+        age: 38,
+        gender: 'male',
+        lookingfor: 'female',
+        location: 'Lynn MA',
+        image: 'https://randomuser.me/api/portraits/men/83.jpg'
+    }
+];
+
+const profiles = profileIterator(data);
+
+// Call first profile
+nextProfile();
+
+// Next Event
+document.getElementById('next').addEventListener('click', nextProfile);
+
+// Next Profile Display
+function nextProfile() {
+    const currentProfile = profiles.next().value;
+    
+    if(currentProfile !== undefined) {
+        document.getElementById('profileDisplay').innerHTML = `
+        <ul class="list-group">
+        <li class="list-group-item">Name: ${currentProfile.name}</li>
+        <li class="list-group-item">Age: ${currentProfile.age}</li>
+        <li class="list-group-item">Location: ${currentProfile.location}</li>
+        <li class="list-group-item">Preference: ${currentProfile.gender} looking for ${currentProfile.lookingfor}</li>
+        </ul>
+        `;
+        
+        document.getElementById('imageDisplay').innerHTML = `<img src="${currentProfile.image}">`;
+    } else {
+        // No more profiles
+        window.location.reload();
+    }
+}
+
+// Profile Iterator
+function profileIterator(profiles) {
+    let nextIndex = 0;
+    
+    return {
+        next: function() {
+            return nextIndex < profiles.length ? 
+            { value: profiles[nextIndex++], done: false } : 
+            { done: true }
+        }
+    };
+}
+
+/* **************************************************************
+Symbols
+************************************************************** */
+
+
+// Create a symbol
+// const sym1 = Symbol();
+// const sym2 = Symbol('sym2');
+
+// console.log(typeof sym2);
+
+// console.log(Symbol('123') === Symbol('123'));
+// console.log(`Hello ${sym1.toString()}`);
+
+// Unique Object Keys
+const KEY1 = Symbol();
+const KEY2 = Symbol('sym2');
+
+const myObj = {};
+
+myObj[KEY1] = 'Prop1';
+myObj[KEY2] = 'Prop2';
+myObj.key3 = 'Prop3';
+myObj.key4 = 'Prop4';
+
+// console.log(myObj[KEY1]);
+// console.log(myObj[KEY2]);
+
+// Symbols are not enumerable in for...in
+// for(let i in myObj) {
+    //   console.log(`${i}: ${myObj[i]}`);
+    // }
+    
+    // Symbols are ignored by JSON.stringify
+    console.log(JSON.stringify({key: 'prop'}));
+    console.log(JSON.stringify({[Symbol('sym1')]: 'prop'}));
+    
+    
+    
+    /* **************************************************************
+        Destructuring
+    ************************************************************** */
+   
+   
+   // Destructuring Assignment
+   
+   let a, b;
+   [a, b] = [100, 200];
+   // Rest pattern
+   [a, b, c, ...rest] = [100, 200, 300, 400, 500];
+   
+   ({ a, b } = { a: 100, b: 200, c: 300, d: 400, e: 500 });
+   ({ a, b, ...rest} = { a: 100, b: 200, c: 300, d: 400, e: 500 });
+   
+   // Array Destructuring
+   
+   // const people = ['John', 'Beth', 'Mike'];
+   
+   // const [person1, person2, person3] = people;
+   
+   // console.log(person1, person2, person3);
+   
+   // Parse array returned from function
+   // function getPeople() {
+       //   return ['John', 'Beth', 'Mike'];
+       // }
+       
+       // let person1, person2, person3;
+       // [person1, person2, person3] = getPeople();
+       
+       // console.log(person1, person2, person3);
+       
+       // Object Destructuring
+       
+       const person = {
+           name: 'John Doe',
+           age: 32,
+           city: 'Miami',
+           gender: 'Male',
+           sayHello: function(){
+               console.log('Hello');
+            }
+        }
+        
+        // Old ES5
+        // const name = person.name,
+        //       age = person.age,
+        //       city = person.city;
+        
+        // New ES6 Destructuring
+        const { name, age, city, sayHello } = person;
+        
+        console.log(name, age, city);
+        
+        sayHello();
+        
+        /* **************************************************************
+            ES6 Maps
+        ************************************************************** */
+       
+       
+       // MAPS = key-value pairs - can use ANY type as a key or value
+       
+       const map1 = new Map();
+       
+       // Set Keys
+       const key1 = 'some string',
+       key2 = {},
+       key3 = function() {};
+       
+       // Set map values by key
+       map1.set(key1, 'Value of key1');
+       map1.set(key2, 'Value of key2');
+       map1.set(key3, 'Value of key3');
+       
+       // Get values by key
+       // console.log(map1.get(key1), map1.get(key2), map1.get(key3));
+       
+       // Count values
+       // console.log(map1.size);
+       
+       // ITERATING MAPS
+       
+       // Loop using for...of to get keys and values
+       // for(let [key, value] of map1) {
+           //   console.log(`${key} = ${value}`);
+           // }
+           
+           // Iterate keys only
+           // for(let key of map1.keys()) {
+               //   console.log(key);
+               // }
+               
+               // Iterate values only
+               // for(let value of map1.values()) {
+                   //   console.log(value);
+                   // }
+                   
+                   // Loop with forEach
+// map1.forEach(function(value, key){
+    //   console.log(`${key} = ${value}`);
+    // });
+    
+    // CONVERT TO ARRAYS
+    
+    // Create an array of the key value pairs
+    const keyValArr = Array.from(map1);
+    console.log(keyValArr);
+    
+    // Create an array of the values
+    const valArr = Array.from(map1.values());
+    console.log(valArr);
+    
+    // Create an array of the keys
+    const keyArr = Array.from(map1.keys());
+    console.log(keyArr);
+    
+
+
+    /* **************************************************************
+        ES6 Sets
+    ************************************************************** */
+   
+   // SETS - Store unique values of any type
+   
+   const set1 = new Set();
+   
+   // Add values to set
+   set1.add(100);
+   set1.add('A string');
+   set1.add({name: 'John'});
+   set1.add(true);
+   set1.add(100);
+   
+   // const set2 = new Set([1, true, 'string']);
+// console.log(set2);
+
+// console.log(set1);
+
+// Get count
+// console.log(set1.size);
+
+// Check for values
+// console.log(set1.has(100));
+// console.log(set1.has(50 + 50));
+// console.log(set1.has({name: 'John'}));
+
+// Delete from set
+// set1.delete(100);
+
+// console.log(set1);
+
+// ITERATING THROUGH SETS
+
+// For..of 
+// for(let item of set1) {
+    //   console.log(item);
+    // }
+    
+    // ForEach Loop
+    // set1.forEach((value) => {
+        //   console.log(value);
+        // });
+        
+// CONVERT SET TO ARRAY
+const setArr = Array.from(set1);
+console.log(setArr);
+
+
+
+/* **************************************************************
+    Module & Revealing Module Pattern
+************************************************************** */
+
+
+// Basic structure
+
+// (function() {
+    //   // Declare private vars and functions
+    
+    //   return {
+        //     // Declare public var and functions
+        //   }
+        // })();
+        
+        // STANDARD MODULE PATTERN
+        // const UICtrl = (function() {
+            //   let text = 'Hello World';
+            
+            //   const changeText = function() {
+                //     const element = document.querySelector('h1');
+                //     element.textContent = text;
+                //   }
+                
+                //   return {
+                    //     callChangeText: function() {
+                        //       changeText();
+                        //       // console.log(text);
+                        //     }
+                        //   }
+                        // })();
+                        
+                        // UICtrl.callChangeText();
+                        // // UICtrl.changeText();
+                        
+                        // console.log(UICtrl.text);
+                        
+                        // REVEALING MODULE PATTERN
+                        const ItemCtrl = (function() {
+                            let data = [];
+                            
+                            function add(item) {
+                                data.push(item);
+                                console.log('Item Added....');
+                            }
+                            
+                            function get(id) {
+                                return data.find(item => {
+                                    return item.id === id;
+                                });
+                            }
+                            
+                            return {
+                                add: add,
+                                // get: get
+                            }
+                        })();
+                        
+                        ItemCtrl.add({id: 1, name: 'John'});
+                        ItemCtrl.add({id: 2, name: 'Mark'});
+                        console.log(ItemCtrl.get(2));
+                        
+                        
+                        
+                        
+    /* **************************************************************
+        Singleton Pattern
+    ************************************************************** */
+   
+   const Singleton = (function() {
+       let instance;
+       
+       function createInstance() {
+           const object = new Object({name:'Brad'});
+           return object;
+        }
+        
+        return {
+            getInstance: function() {
+                if(!instance){
+                    instance = createInstance();
+                }
+                return instance;
+            }
+        }
+    })();
+    
+    const instanceA = Singleton.getInstance();
+    const instanceB = Singleton.getInstance();
+    
+    console.log(instanceA === instanceB);
+    
+    // console.log(instanceA);
+    
+
+
+    /* **************************************************************
+        Factory Pattern
+    ************************************************************** */
+   
+   function MemberFactory() {
+       this.createMember = function(name, type) {
+           let member;
+           
+           if(type === 'simple') {
+               member = new SimpleMembership(name);
+            } else if (type === 'standard') {
+                member = new StandardMembership(name);
+            } else if (type === 'super') {
+                member = new SuperMembership(name);
+            }
+            
+            member.type = type;
+            
+            member.define =  function() {
+                console.log(`${this.name} (${this.type}): ${this.cost}`);
+            }
+            
+            return member;
+        }
+    }
+    
+    const SimpleMembership = function(name) {
+        this.name = name;
+        this.cost = '$5';
+    }
+    
+    const StandardMembership = function(name) {
+        this.name = name;
+        this.cost = '$15';
+    }
+    
+    const SuperMembership = function(name) {
+        this.name = name;
+  this.cost = '$25';
+}
+
+const members = [];
+const factory = new MemberFactory();
+
+members.push(factory.createMember('John Doe', 'simple'));
+members.push(factory.createMember('Chris Jackson', 'super'));
+members.push(factory.createMember('Janice Williams', 'simple'));
+members.push(factory.createMember('Tom Smith', 'standard'));
+
+// console.log(members);
+
+members.forEach(function(member) {
+    member.define();
+});
+
+
+
+/* **************************************************************
+    Observer Pattern
+************************************************************** */
+
+
+function EventObserver() {
+    this.observers = [];
+}
+
+EventObserver.prototype = {
+    subscribe: function(fn) {
+        this.observers.push(fn);
+        console.log(`You are now subscribed to ${fn.name}`);
+    },
+    unsubscribe: function(fn) {
+        // Filter out from the list whatever matches the callback function. If there is no match, the callback gets to stay on the list. The filter returns a new list and reassigns the list of observers.
+        this.observers = this.observers.filter(function(item){
+            if(item !== fn) {
+                return item;
+            }
+        });
+        console.log(`You are now unsubscribed from ${fn.name}`);
+    },
+    fire: function() {
+        this.observers.forEach(function(item) {
+            item.call();
+        });
+    }
+}
+
+const click = new EventObserver();
+
+// Event Listeners
+document.querySelector('.sub-ms').addEventListener('click', function() {
+    click.subscribe(getCurMilliseconds);
+});
+
+document.querySelector('.unsub-ms').addEventListener('click', function() {
+    click.unsubscribe(getCurMilliseconds);
+});
+
+document.querySelector('.sub-s').addEventListener('click', function() {
+    click.subscribe(getCurSeconds);
+});
+
+document.querySelector('.unsub-s').addEventListener('click', function() {
+    click.unsubscribe(getCurSeconds);
+});
+
+document.querySelector('.fire').addEventListener('click', function() {
+    click.fire();
+});
+
+// Click Handler
+const getCurMilliseconds = function() {
+    console.log(`Current Milliseconds: ${new Date().getMilliseconds()}`);
+}
+
+const getCurSeconds = function() {
+    console.log(`Current Seconds: ${new Date().getSeconds()}`);
+}
+
+
+
+/* **************************************************************
+    Mediator Pattern
+************************************************************** */
+
+
+const User = function(name) {
+    this.name = name;
+    this.chatroom = null;
+}
+
+User.prototype = {
+    send: function(message, to) {
+        this.chatroom.send(message, this, to);
+    },
+    recieve: function(message, from) {
+        console.log(`${from.name} to ${this.name}: ${message}`);
+    }
+}
+
+const Chatroom = function() {
+    let users = {}; // list of users
+    
+    return {
+        register: function(user) {
+            users[user.name] = user;
+            user.chatroom = this;
+        },
+        send: function(message, from, to) {
+            if(to) {
+                // Single user message
+                to.recieve(message, from);
+            } else {
+                // Mass message
+                for(key in users) {
+                    if(users[key] !== from) {
+                        users[key].recieve(message, from);
+                    }
+                }
+            }
+        }
+    }
+}
+
+const brad = new User('Brad');
+const jeff = new User('Jeff');
+const sara = new User('Sara');
+
+const chatroom = new Chatroom();
+
+chatroom.register(brad);
+chatroom.register(jeff);
+chatroom.register(sara);
+
+brad.send('Hello Jeff', jeff);
+sara.send('Hello Brad, you are the best dev ever!', brad);
+jeff.send('Hello Everyone!!!!');
+
+
+
+/* **************************************************************
+    State Pattern
+************************************************************** */
+
+
+const PageState = function() {
+  let currentState = new homeState(this);
+
+  this.init = function() {
+    this.change(new homeState);
+  }
+
+  this.change = function(state) {
+    currentState = state;
+  }
+};
+
+// Home State
+const homeState = function(page) {
+  document.querySelector('#heading').textContent = null;
+  document.querySelector('#content').innerHTML = `
+    <div class="jumbotron">
+    <h1 class="display-3">Hello, world!</h1>
+    <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+    <hr class="my-4">
+    <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+    <p class="lead">
+      <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+    </p>
+  </div>
+  `;
+};
+
+// About State
+const aboutState = function(page) {
+  document.querySelector('#heading').textContent = 'About Us';
+  document.querySelector('#content').innerHTML = `
+    <p>This is the about page</p>
+`;
+};
+
+// Contact State
+const contactState = function(page) {
+  document.querySelector('#heading').textContent = 'Contact Us';
+  document.querySelector('#content').innerHTML = `
+  <form>
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" class="form-control">
+    </div>
+    <div class="form-group">
+    <label>Email address</label>
+    <input type="email" class="form-control">
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+`;
+};
+
+// Instantiate pageState
+const page = new PageState();
+
+// Init the first state
+page.init();
+
+// UI Vars
+const home = document.getElementById('home'),
+      about = document.getElementById('about'),
+      contact = document.getElementById('contact');
+
+// Home
+home.addEventListener('click', (e) => {
+  page.change(new homeState);
+
+  e.preventDefault();
+});
+
+// About
+about.addEventListener('click', (e) => {
+  page.change(new aboutState);
+
+  e.preventDefault();
+});
+
+// Contact
+contact.addEventListener('click', (e) => {
+  page.change(new contactState);
+
+  e.preventDefault();
+});
