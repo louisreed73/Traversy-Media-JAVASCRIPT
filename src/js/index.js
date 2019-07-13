@@ -3273,6 +3273,14 @@ const homeState = function(page) {
   `;
 };
 
+
+
+
+
+
+
+
+
 // About State
 const aboutState = function(page) {
   document.querySelector('#heading').textContent = 'About Us';
